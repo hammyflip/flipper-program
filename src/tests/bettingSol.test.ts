@@ -62,6 +62,7 @@ describe("Betting tests, treasury mint = SOL", () => {
   it("Place bet", async () => {
     const amount = LAMPORTS_PER_SOL;
     const bets = 1;
+    const numFlips = 1;
 
     const bettorLamportsBefore = await getAccountLamports(
       connection,
@@ -76,6 +77,7 @@ describe("Betting tests, treasury mint = SOL", () => {
       {
         amount,
         bets,
+        numFlips,
       }
     );
     await sendTransactionForTest(connection, tx, [USER]);
@@ -92,6 +94,7 @@ describe("Betting tests, treasury mint = SOL", () => {
 
     expect(bettorInfoAccount.amount.toNumber()).toEqual(amount);
     expect(bettorInfoAccount.bets).toEqual(bets);
+    expect(bettorInfoAccount.numFlips).toEqual(numFlips);
 
     expect(bettorLamportsBefore - bettorLamportsAfter).toEqual(
       // TODO: not sure why fees are not taken from the bettor?

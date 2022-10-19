@@ -118,6 +118,7 @@ pub mod flipper_program {
         bettor_info.amount = 0;
         bettor_info.bets = 0;
         bettor_info.results = 0;
+        bettor_info.num_flips = 0;
 
         Ok(())
     }
@@ -247,6 +248,7 @@ pub mod flipper_program {
         bettor_info_payment_account_bump: u8,
         bets: u8,
         amount: u64,
+        num_flips: u8,
     ) -> Result<()> {
         if amount == 0 {
             return Err(ErrorCode::InvalidBetAmount.into());
@@ -291,8 +293,12 @@ pub mod flipper_program {
         if bettor_info.amount > 0 {
             return Err(ErrorCode::MultipleBetsNotAllowed.into());
         }
+        if num_flips == 0 || num_flips > 8 {
+            return Err(ErrorCode::InvalidNumFlips.into());
+        }
         bettor_info.amount = amount;
         bettor_info.bets = bets;
+        bettor_info.num_flips = num_flips;
 
         let fee_basis_points: u64 = auction_house.fee_basis_points.into();
         let fee_amount = (bettor_info.amount * fee_basis_points) / 10_000;
@@ -643,13 +649,14 @@ pub struct BettorInfo {
     pub bets: u8,
     // Bitmask of coin flip results. Least significant bit represents the first flip.
     pub results: u8,
-    // TODO: need to add num flips
+    pub num_flips: u8,
 }
 
 pub const BETTOR_INFO_SIZE: usize = 8 + // discriminator
 8 + // amount
-2 + // bets
-2 + // results
+1 + // bets
+1 + // results
+1 + // num_flips
 32; // padding
 
 //
@@ -670,4 +677,6 @@ pub enum ErrorCode {
     MultipleBetsNotAllowed,
     #[msg("Bet amounts must be greater than 0")]
     InvalidBetAmount,
+    #[msg("Number of flips must be at least 1 and at most 8")]
+    InvalidNumFlips,
 }

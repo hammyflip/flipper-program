@@ -16,12 +16,13 @@ type Accounts = {
 type Args = {
   amount: number;
   bets: number;
+  numFlips: number;
   program: FlipperProgram;
 };
 
 export default async function placeBetIx(
   { auctionHouse, bettor, paymentAccount, treasuryMint }: Accounts,
-  { amount, bets, program }: Args
+  { amount, bets, numFlips, program }: Args
 ): Promise<TransactionInstruction> {
   const [auctionHouseTreasury] = await findAuctionHouseTreasuryPda(
     auctionHouse,
@@ -40,7 +41,7 @@ export default async function placeBetIx(
     );
 
   return program.methods
-    .placeBet(bettorInfoPaymentAccountBump, bets, new BN(amount))
+    .placeBet(bettorInfoPaymentAccountBump, bets, new BN(amount), numFlips)
     .accounts({
       auctionHouse,
       auctionHouseTreasury,

@@ -124,9 +124,11 @@ export default class FlipperSdk {
     {
       amount,
       bets,
+      numFlips,
     }: {
       amount: number;
       bets: number;
+      numFlips: number;
     }
   ) {
     invariant(bets <= 256, "bets should be an 8-bit bitmask");
@@ -144,6 +146,7 @@ export default class FlipperSdk {
       {
         amount,
         bets,
+        numFlips,
         program: this.program,
       }
     );

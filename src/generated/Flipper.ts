@@ -270,6 +270,10 @@ export type FlipperProgram = {
         {
           name: "amount";
           type: "u64";
+        },
+        {
+          name: "numFlips";
+          type: "u8";
         }
       ];
     },
@@ -440,6 +444,10 @@ export type FlipperProgram = {
           {
             name: "results";
             type: "u8";
+          },
+          {
+            name: "numFlips";
+            type: "u8";
           }
         ];
       };
@@ -453,23 +461,33 @@ export type FlipperProgram = {
     },
     {
       code: 6001;
-      name: "InvalidBettorInfoAmount";
-      msg: "BetterInfo amount must be greater than 0";
-    },
-    {
-      code: 6002;
       name: "UninitializedAccount";
       msg: "UninitializedAccount";
     },
     {
-      code: 6003;
+      code: 6002;
       name: "PublicKeyMismatch";
       msg: "PublicKeyMismatch";
     },
     {
-      code: 6004;
+      code: 6003;
       name: "IncorrectOwner";
       msg: "IncorrectOwner";
+    },
+    {
+      code: 6004;
+      name: "MultipleBetsNotAllowed";
+      msg: "You are only allowed to place one bet at a time";
+    },
+    {
+      code: 6005;
+      name: "InvalidBetAmount";
+      msg: "Bet amounts must be greater than 0";
+    },
+    {
+      code: 6006;
+      name: "InvalidNumFlips";
+      msg: "Number of flips must be at least 1 and at most 8";
     }
   ];
 };
@@ -747,6 +765,10 @@ export const IDL: FlipperProgram = {
           name: "amount",
           type: "u64",
         },
+        {
+          name: "numFlips",
+          type: "u8",
+        },
       ],
     },
     {
@@ -917,6 +939,10 @@ export const IDL: FlipperProgram = {
             name: "results",
             type: "u8",
           },
+          {
+            name: "numFlips",
+            type: "u8",
+          },
         ],
       },
     },
@@ -929,23 +955,33 @@ export const IDL: FlipperProgram = {
     },
     {
       code: 6001,
-      name: "InvalidBettorInfoAmount",
-      msg: "BetterInfo amount must be greater than 0",
-    },
-    {
-      code: 6002,
       name: "UninitializedAccount",
       msg: "UninitializedAccount",
     },
     {
-      code: 6003,
+      code: 6002,
       name: "PublicKeyMismatch",
       msg: "PublicKeyMismatch",
     },
     {
-      code: 6004,
+      code: 6003,
       name: "IncorrectOwner",
       msg: "IncorrectOwner",
+    },
+    {
+      code: 6004,
+      name: "MultipleBetsNotAllowed",
+      msg: "You are only allowed to place one bet at a time",
+    },
+    {
+      code: 6005,
+      name: "InvalidBetAmount",
+      msg: "Bet amounts must be greater than 0",
+    },
+    {
+      code: 6006,
+      name: "InvalidNumFlips",
+      msg: "Number of flips must be at least 1 and at most 8",
     },
   ],
 };
