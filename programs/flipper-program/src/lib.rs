@@ -141,6 +141,7 @@ pub mod flipper_program {
         let treasury_mint = &ctx.accounts.treasury_mint;
         let token_program = &ctx.accounts.token_program;
         let auction_house_treasury = &ctx.accounts.auction_house_treasury;
+        let auction_house = &ctx.accounts.auction_house;
 
         let system_program = &ctx.accounts.system_program;
 
@@ -160,11 +161,16 @@ pub mod flipper_program {
             treasury_mint_key.as_ref(),
             &[bettor_info_payment_account_bump],
         ];
+        let auction_house_key = auction_house.key();
+        let auction_house_treasury_signer_seeds = [
+            TREASURY.as_bytes(),
+            auction_house_key.as_ref(),
+            &[auction_house.treasury_bump],
+        ];
 
         if bettor_info.bets == bettor_info.results {
             // Pay bettor
             if is_native {
-                // TODO: need to double the payout, send some from treasury
                 invoke_signed(
                     &system_instruction::transfer(
                         &bettor_info_payment_account.key(),
@@ -178,8 +184,21 @@ pub mod flipper_program {
                     ],
                     &[&bettor_info_payment_account_signer_seeds],
                 )?;
+
+                invoke_signed(
+                    &system_instruction::transfer(
+                        &auction_house_treasury.key(),
+                        &bettor.key(),
+                        amount,
+                    ),
+                    &[
+                        auction_house_treasury.to_account_info(),
+                        bettor.to_account_info(),
+                        system_program.to_account_info(),
+                    ],
+                    &[&auction_house_treasury_signer_seeds],
+                )?;
             } else {
-                // TODO: need to double the payout, send some from treasury
                 invoke_signed(
                     &spl_token::instruction::transfer(
                         token_program.key,
@@ -198,11 +217,29 @@ pub mod flipper_program {
                     ],
                     &[&bettor_info_payment_account_signer_seeds],
                 )?;
+
+                invoke_signed(
+                    &spl_token::instruction::transfer(
+                        token_program.key,
+                        &auction_house_treasury.key(),
+                        // TODO: assert ATA
+                        &bettor_payment_account.key(),
+                        &bettor_info.key(),
+                        &[],
+                        amount,
+                    )?,
+                    &[
+                        auction_house_treasury.to_account_info(),
+                        bettor_payment_account.to_account_info(),
+                        token_program.to_account_info(),
+                        bettor_info.to_account_info(),
+                    ],
+                    &[&auction_house_treasury_signer_seeds],
+                )?;
             }
         } else {
             // Pay treasury
             if is_native {
-                // TODO: need to double the payout, send some from treasury
                 invoke_signed(
                     &system_instruction::transfer(
                         &bettor_info_payment_account.key(),
@@ -217,7 +254,6 @@ pub mod flipper_program {
                     &[&bettor_info_payment_account_signer_seeds],
                 )?;
             } else {
-                // TODO: need to double the payout, send some from treasury
                 invoke_signed(
                     &spl_token::instruction::transfer(
                         token_program.key,

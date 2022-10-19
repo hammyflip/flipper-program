@@ -2,7 +2,6 @@ import { setProvider, AnchorProvider } from "@project-serum/anchor";
 import { Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { WRAPPED_SOL_MINT } from "constants/AccountConstants";
 import FlipperSdk from "sdk/FlipperSdk";
-import FEE_LAMPORTS from "tests/constants/FeeLamports";
 import expectToThrow from "tests/utils/expectToThrow";
 import getAccountLamports from "tests/utils/getAccountLamports";
 import requestAirdrops from "tests/utils/requestAirdrops";
