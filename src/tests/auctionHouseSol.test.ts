@@ -1,6 +1,5 @@
 import { setProvider, AnchorProvider } from "@project-serum/anchor";
 import { Keypair } from "@solana/web3.js";
-import { expect } from "chai";
 import { WRAPPED_SOL_MINT } from "constants/AccountConstants";
 import FlipperSdk from "sdk/FlipperSdk";
 import getAccountLamports from "tests/utils/getAccountLamports";
@@ -13,7 +12,7 @@ const NEW_AUTHORITY = Keypair.generate();
 const USER = Keypair.generate();
 const TREASURY_MINT = WRAPPED_SOL_MINT;
 
-describe("Auction House tests", () => {
+describe("Auction House tests, treasury mint = SOL", () => {
   // Configure the client to use the local cluster.
   const provider = AnchorProvider.env();
   const { wallet, connection } = provider;
@@ -30,7 +29,7 @@ describe("Auction House tests", () => {
     await requestAirdrops(connection, [AUTHORITY, NEW_AUTHORITY, USER]);
   });
 
-  it("Create auction house, treasury mint = SOL", async () => {
+  it("Create auction house", async () => {
     const feeBasisPoints = 300;
 
     const tx = await sdk.createAuctionHouseTx(
@@ -46,30 +45,27 @@ describe("Auction House tests", () => {
     await sendTransactionForTest(connection, tx, [USER]);
 
     const { account: auctionHouseAccount, pubkey: auctionHousePubkey } =
-      await sdk.fetchAuctionHouseByTreasuryMint(
-        AUTHORITY.publicKey,
-        TREASURY_MINT
-      );
+      await sdk.fetchAuctionHouse(AUTHORITY.publicKey, TREASURY_MINT);
     const [auctionHouseTreasuryExpected] =
       await sdk.findAuctionHouseTreasuryPda(auctionHousePubkey);
     const { authority, creator, treasuryMint, auctionHouseTreasury } =
       auctionHouseAccount;
-    expect(authority.toString()).equals(AUTHORITY.publicKey.toString());
-    expect(creator.toString()).equals(AUTHORITY.publicKey.toString());
-    expect(treasuryMint.toString()).equals(TREASURY_MINT.toString());
-    expect(auctionHouseAccount.treasuryMint.toString()).equals(
+    expect(authority.toString()).toEqual(AUTHORITY.publicKey.toString());
+    expect(creator.toString()).toEqual(AUTHORITY.publicKey.toString());
+    expect(treasuryMint.toString()).toEqual(TREASURY_MINT.toString());
+    expect(auctionHouseAccount.treasuryMint.toString()).toEqual(
       TREASURY_MINT.toString()
     );
-    expect(auctionHouseTreasury.toString()).equals(
+    expect(auctionHouseTreasury.toString()).toEqual(
       auctionHouseTreasuryExpected.toString()
     );
-    expect(auctionHouseAccount.treasuryWithdrawalDestination.toString()).equals(
-      AUTHORITY.publicKey.toString()
-    );
-    expect(auctionHouseAccount.feeBasisPoints).equals(feeBasisPoints);
+    expect(
+      auctionHouseAccount.treasuryWithdrawalDestination.toString()
+    ).toEqual(AUTHORITY.publicKey.toString());
+    expect(auctionHouseAccount.feeBasisPoints).toEqual(feeBasisPoints);
   });
 
-  it("Update auction house, treasury mint = SOL", async () => {
+  it("Update auction house", async () => {
     const updatedFeeBasisPoints = 500;
     const tx = await sdk.updateAuctionHouseTx(
       {
@@ -83,19 +79,18 @@ describe("Auction House tests", () => {
 
     await sendTransactionForTest(connection, tx, [AUTHORITY]);
 
-    const { account: auctionHouseAccount } =
-      await sdk.fetchAuctionHouseByTreasuryMint(
-        AUTHORITY.publicKey,
-        TREASURY_MINT
-      );
+    const { account: auctionHouseAccount } = await sdk.fetchAuctionHouse(
+      AUTHORITY.publicKey,
+      TREASURY_MINT
+    );
     const { authority, creator, treasuryMint } = auctionHouseAccount;
-    expect(authority.toString()).equals(NEW_AUTHORITY.publicKey.toString());
-    expect(creator.toString()).equals(AUTHORITY.publicKey.toString());
-    expect(auctionHouseAccount.feeBasisPoints).equals(updatedFeeBasisPoints);
-    expect(treasuryMint.toString()).equals(TREASURY_MINT.toString());
+    expect(authority.toString()).toEqual(NEW_AUTHORITY.publicKey.toString());
+    expect(creator.toString()).toEqual(AUTHORITY.publicKey.toString());
+    expect(auctionHouseAccount.feeBasisPoints).toEqual(updatedFeeBasisPoints);
+    expect(treasuryMint.toString()).toEqual(TREASURY_MINT.toString());
   });
 
-  it("Withdraw from treasury, treasury mint = SOL", async () => {
+  it("Withdraw from treasury", async () => {
     // First, send some money to the treasury
     const [auctionHouse] = await sdk.findAuctionHousePda(
       AUTHORITY.publicKey,
@@ -137,7 +132,7 @@ describe("Auction House tests", () => {
       AUTHORITY.publicKey
     );
 
-    expect(treasuryLamportsBefore - treasuryLamportsAfter).equals(amount);
-    expect(authorityLamportsAfter - authorityLamportsBefore).equals(amount);
+    expect(treasuryLamportsBefore - treasuryLamportsAfter).toEqual(amount);
+    expect(authorityLamportsAfter - authorityLamportsBefore).toEqual(amount);
   });
 });

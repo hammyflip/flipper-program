@@ -2,6 +2,7 @@ import { AnchorProvider, Idl, Program, web3 } from "@project-serum/anchor";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { Flipper, FlipperProgram, FLIPPER_IDL } from "generated";
 import createAuctionHouseIx from "sdk/instructions/createAuctionHouseIx";
+import createBettorInfoIx from "sdk/instructions/createBettorInfoIx";
 import updateAuctionHouseIx from "sdk/instructions/updateAuctionHouseIx";
 import withdrawFromTreasuryIx from "sdk/instructions/withdrawFromTreasuryIx";
 import AnchorWallet from "types/AnchorWallet";
@@ -82,6 +83,25 @@ export default class FlipperSdk {
       },
       {
         feeBasisPoints,
+        program: this.program,
+      }
+    );
+    return ixToTx(ix);
+  }
+
+  async createBettorInfo({
+    bettor,
+    treasuryMint,
+  }: {
+    bettor: PublicKey;
+    treasuryMint: PublicKey;
+  }) {
+    const ix = await createBettorInfoIx(
+      {
+        bettor,
+        treasuryMint,
+      },
+      {
         program: this.program,
       }
     );
@@ -169,10 +189,7 @@ export default class FlipperSdk {
   // FETCH ACCOUNTS
   //
 
-  async fetchAuctionHouseByTreasuryMint(
-    creator: PublicKey,
-    treasuryMint: PublicKey
-  ) {
+  async fetchAuctionHouse(creator: PublicKey, treasuryMint: PublicKey) {
     const [auctionHouse] = await this.findAuctionHousePda(
       creator,
       treasuryMint
@@ -180,6 +197,14 @@ export default class FlipperSdk {
     return {
       account: await this.program.account.auctionHouse.fetch(auctionHouse),
       pubkey: auctionHouse,
+    };
+  }
+
+  async fetchBettorInfo(bettor: PublicKey, treasuryMint: PublicKey) {
+    const [bettorInfo] = await this.findBettorInfoPda(bettor, treasuryMint);
+    return {
+      account: await this.program.account.bettorInfo.fetch(bettorInfo),
+      pubkey: bettorInfo,
     };
   }
 
@@ -206,7 +231,7 @@ export default class FlipperSdk {
     );
   }
 
-  async findBettorInfoPayment(bettor: PublicKey, treasuryMint: PublicKey) {
+  async findBettorInfoPda(bettor: PublicKey, treasuryMint: PublicKey) {
     return findBettorInfoPda(bettor, treasuryMint, this.program.programId);
   }
 }
