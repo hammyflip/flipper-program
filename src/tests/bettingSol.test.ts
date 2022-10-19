@@ -3,6 +3,7 @@ import { Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { WRAPPED_SOL_MINT } from "constants/AccountConstants";
 import FlipperSdk from "sdk/FlipperSdk";
 import FEE_LAMPORTS from "tests/constants/FeeLamports";
+import expectToThrow from "tests/utils/expectToThrow";
 import getAccountLamports from "tests/utils/getAccountLamports";
 import requestAirdrops from "tests/utils/requestAirdrops";
 import sendTransactionForTest from "tests/utils/sendTransactionForTest";
@@ -43,7 +44,7 @@ describe("Betting tests, treasury mint = SOL", () => {
   });
 
   it("Create bettor info", async () => {
-    const tx = await sdk.createBettorInfo({
+    const tx = await sdk.createBettorInfoTx({
       bettor: USER.publicKey,
       treasuryMint: TREASURY_MINT,
     });
@@ -95,6 +96,7 @@ describe("Betting tests, treasury mint = SOL", () => {
     expect(bettorInfoAccount.amount.toNumber()).toEqual(amount);
     expect(bettorInfoAccount.bets).toEqual(bets);
     expect(bettorInfoAccount.numFlips).toEqual(numFlips);
+    expect(bettorInfoAccount.results).toEqual(0);
 
     expect(bettorLamportsBefore - bettorLamportsAfter).toEqual(
       // TODO: not sure why fees are not taken from the bettor?
@@ -102,5 +104,27 @@ describe("Betting tests, treasury mint = SOL", () => {
       // In any case, doesn't appear to be a bug on our end
       amount + amount * (FEE_BASIS_POINTS / 10000)
     );
+  });
+
+  it("Flip", async () => {
+    const results = 1;
+    const tx = await sdk.flipTx(
+      {
+        bettor: USER.publicKey,
+        treasuryMint: TREASURY_MINT,
+      },
+      { results }
+    );
+    await expectToThrow(
+      () => sendTransactionForTest(connection, tx, [USER]),
+      "Signature verification failed"
+    );
+
+    await sendTransactionForTest(connection, tx, [AUTHORITY]);
+    const { account: bettorInfoAccount } = await sdk.fetchBettorInfo(
+      USER.publicKey,
+      TREASURY_MINT
+    );
+    expect(bettorInfoAccount.results).toEqual(results);
   });
 });

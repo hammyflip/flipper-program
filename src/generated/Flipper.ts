@@ -129,6 +129,11 @@ export type FlipperProgram = {
           name: "bettorInfo";
           isMut: true;
           isSigner: false;
+        },
+        {
+          name: "auctionHouse";
+          isMut: false;
+          isSigner: false;
         }
       ];
       args: [
@@ -622,6 +627,11 @@ export const IDL: FlipperProgram = {
         {
           name: "bettorInfo",
           isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "auctionHouse",
+          isMut: false,
           isSigner: false,
         },
       ],

@@ -33,7 +33,7 @@ pub mod flipper_program {
         treasury_bump: u8,
         fee_basis_points: u16,
     ) -> Result<()> {
-        // TODO: add some validation on authority. We should ony allow KNOWN authorities.
+        // TODO: add some validation on authority for mainnet. We should ony allow KNOWN authorities.
 
         let payer = &ctx.accounts.payer;
         let authority = &ctx.accounts.authority;
@@ -151,7 +151,6 @@ pub mod flipper_program {
         }
 
         let amount = bettor_info.amount;
-        bettor_info.amount = 0;
 
         let bettor_key = bettor.key();
         let treasury_mint_key = treasury_mint.key();
@@ -239,6 +238,11 @@ pub mod flipper_program {
                 )?;
             }
         }
+
+        bettor_info.amount = 0;
+        bettor_info.bets = 0;
+        bettor_info.results = 0;
+        bettor_info.num_flips = 0;
 
         Ok(())
     }
@@ -536,6 +540,8 @@ pub struct Flip<'info> {
     treasury_mint: Account<'info, Mint>,
     #[account(mut, seeds=[BETTOR_INFO.as_bytes(), bettor.key().as_ref(), treasury_mint.key().as_ref()], bump)]
     bettor_info: Account<'info, BettorInfo>,
+    #[account(seeds=[AUCTION_HOUSE.as_bytes(), auction_house.creator.as_ref(), treasury_mint.key().as_ref()], bump=auction_house.bump, has_one=authority, has_one=treasury_mint)]
+    auction_house: Account<'info, AuctionHouse>,
 }
 
 #[derive(Accounts)]

@@ -132,6 +132,11 @@ const FLIPPER_IDL: Idl = {
           isMut: true,
           isSigner: false,
         },
+        {
+          name: "auctionHouse",
+          isMut: false,
+          isSigner: false,
+        },
       ],
       args: [
         {

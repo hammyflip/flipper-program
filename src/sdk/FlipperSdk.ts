@@ -3,6 +3,7 @@ import { Connection, PublicKey } from "@solana/web3.js";
 import { Flipper, FlipperProgram, FLIPPER_IDL } from "generated";
 import createAuctionHouseIx from "sdk/instructions/createAuctionHouseIx";
 import createBettorInfoIx from "sdk/instructions/createBettorInfoIx";
+import flipIx from "sdk/instructions/flipIx";
 import placeBetIx from "sdk/instructions/placeBetIx";
 import updateAuctionHouseIx from "sdk/instructions/updateAuctionHouseIx";
 import withdrawFromTreasuryIx from "sdk/instructions/withdrawFromTreasuryIx";
@@ -92,7 +93,7 @@ export default class FlipperSdk {
     return ixToTx(ix);
   }
 
-  async createBettorInfo({
+  async createBettorInfoTx({
     bettor,
     treasuryMint,
   }: {
@@ -105,6 +106,41 @@ export default class FlipperSdk {
         treasuryMint,
       },
       {
+        program: this.program,
+      }
+    );
+    return ixToTx(ix);
+  }
+
+  async flipTx(
+    {
+      bettor,
+      creator,
+      treasuryMint,
+    }: {
+      bettor: PublicKey;
+      creator?: PublicKey;
+      treasuryMint: PublicKey;
+    },
+    {
+      results,
+    }: {
+      results: number;
+    }
+  ) {
+    const [auctionHouse] = await this.findAuctionHousePda(
+      creator ?? this._authority,
+      treasuryMint
+    );
+    const ix = await flipIx(
+      {
+        auctionHouse,
+        authority: this._authority,
+        bettor,
+        treasuryMint,
+      },
+      {
+        results,
         program: this.program,
       }
     );
