@@ -211,7 +211,7 @@ const FLIPPER_IDL: Idl = {
         },
         {
           name: "bettorInfo",
-          isMut: false,
+          isMut: true,
           isSigner: false,
         },
         {
@@ -235,6 +235,16 @@ const FLIPPER_IDL: Idl = {
           isSigner: false,
         },
         {
+          name: "auctionHouse",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "auctionHouseTreasury",
+          isMut: true,
+          isSigner: false,
+        },
+        {
           name: "systemProgram",
           isMut: false,
           isSigner: false,
@@ -254,6 +264,14 @@ const FLIPPER_IDL: Idl = {
         {
           name: "bettorInfoPaymentAccountBump",
           type: "u8",
+        },
+        {
+          name: "bets",
+          type: "u8",
+        },
+        {
+          name: "amount",
+          type: "u64",
         },
       ],
     },

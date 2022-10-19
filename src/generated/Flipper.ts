@@ -209,7 +209,7 @@ export type FlipperProgram = {
         },
         {
           name: "bettorInfo";
-          isMut: false;
+          isMut: true;
           isSigner: false;
         },
         {
@@ -233,6 +233,16 @@ export type FlipperProgram = {
           isSigner: false;
         },
         {
+          name: "auctionHouse";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "auctionHouseTreasury";
+          isMut: true;
+          isSigner: false;
+        },
+        {
           name: "systemProgram";
           isMut: false;
           isSigner: false;
@@ -252,6 +262,14 @@ export type FlipperProgram = {
         {
           name: "bettorInfoPaymentAccountBump";
           type: "u8";
+        },
+        {
+          name: "bets";
+          type: "u8";
+        },
+        {
+          name: "amount";
+          type: "u64";
         }
       ];
     },
@@ -667,7 +685,7 @@ export const IDL: FlipperProgram = {
         },
         {
           name: "bettorInfo",
-          isMut: false,
+          isMut: true,
           isSigner: false,
         },
         {
@@ -691,6 +709,16 @@ export const IDL: FlipperProgram = {
           isSigner: false,
         },
         {
+          name: "auctionHouse",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "auctionHouseTreasury",
+          isMut: true,
+          isSigner: false,
+        },
+        {
           name: "systemProgram",
           isMut: false,
           isSigner: false,
@@ -710,6 +738,14 @@ export const IDL: FlipperProgram = {
         {
           name: "bettorInfoPaymentAccountBump",
           type: "u8",
+        },
+        {
+          name: "bets",
+          type: "u8",
+        },
+        {
+          name: "amount",
+          type: "u64",
         },
       ],
     },

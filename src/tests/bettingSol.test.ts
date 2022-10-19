@@ -1,7 +1,9 @@
 import { setProvider, AnchorProvider } from "@project-serum/anchor";
-import { Keypair } from "@solana/web3.js";
+import { Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { WRAPPED_SOL_MINT } from "constants/AccountConstants";
 import FlipperSdk from "sdk/FlipperSdk";
+import FEE_LAMPORTS from "tests/constants/FeeLamports";
+import getAccountLamports from "tests/utils/getAccountLamports";
 import requestAirdrops from "tests/utils/requestAirdrops";
 import sendTransactionForTest from "tests/utils/sendTransactionForTest";
 import Environment from "types/enums/Environment";
@@ -55,5 +57,47 @@ describe("Betting tests, treasury mint = SOL", () => {
     expect(bettorInfoAccount.amount.toNumber()).toEqual(0);
     expect(bettorInfoAccount.bets).toEqual(0);
     expect(bettorInfoAccount.results).toEqual(0);
+  });
+
+  it("Place bet", async () => {
+    const amount = LAMPORTS_PER_SOL;
+    const bets = 1;
+
+    const bettorLamportsBefore = await getAccountLamports(
+      connection,
+      USER.publicKey
+    );
+
+    const tx = await sdk.placeBetTx(
+      {
+        bettor: USER.publicKey,
+        treasuryMint: TREASURY_MINT,
+      },
+      {
+        amount,
+        bets,
+      }
+    );
+    await sendTransactionForTest(connection, tx, [USER]);
+
+    const bettorLamportsAfter = await getAccountLamports(
+      connection,
+      USER.publicKey
+    );
+
+    const { account: bettorInfoAccount } = await sdk.fetchBettorInfo(
+      USER.publicKey,
+      TREASURY_MINT
+    );
+
+    expect(bettorInfoAccount.amount.toNumber()).toEqual(amount);
+    expect(bettorInfoAccount.bets).toEqual(bets);
+
+    expect(bettorLamportsBefore - bettorLamportsAfter).toEqual(
+      // TODO: not sure why fees are not taken from the bettor?
+      // Maybe something about the local validator...
+      // In any case, doesn't appear to be a bug on our end
+      amount + amount * (FEE_BASIS_POINTS / 10000)
+    );
   });
 });

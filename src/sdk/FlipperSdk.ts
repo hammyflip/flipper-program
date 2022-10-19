@@ -3,8 +3,10 @@ import { Connection, PublicKey } from "@solana/web3.js";
 import { Flipper, FlipperProgram, FLIPPER_IDL } from "generated";
 import createAuctionHouseIx from "sdk/instructions/createAuctionHouseIx";
 import createBettorInfoIx from "sdk/instructions/createBettorInfoIx";
+import placeBetIx from "sdk/instructions/placeBetIx";
 import updateAuctionHouseIx from "sdk/instructions/updateAuctionHouseIx";
 import withdrawFromTreasuryIx from "sdk/instructions/withdrawFromTreasuryIx";
+import invariant from "tiny-invariant";
 import AnchorWallet from "types/AnchorWallet";
 import Environment from "types/enums/Environment";
 import getAccountsForEnvironment from "utils/getAccountsForEnvironment";
@@ -12,6 +14,7 @@ import findAuctionHousePda from "utils/pdas/findAuctionHousePda";
 import findAuctionHouseTreasuryPda from "utils/pdas/findAuctionHouseTreasuryPda";
 import findBettorInfoPaymentAccountPda from "utils/pdas/findBettorInfoPaymentAccountPda";
 import findBettorInfoPda from "utils/pdas/findBettorInfoPda";
+import getWalletIfNativeElseAta from "utils/solana/getWalletIfNativeElseAta";
 import ixToTx from "utils/solana/ixToTx";
 
 export default class FlipperSdk {
@@ -102,6 +105,45 @@ export default class FlipperSdk {
         treasuryMint,
       },
       {
+        program: this.program,
+      }
+    );
+    return ixToTx(ix);
+  }
+
+  async placeBetTx(
+    {
+      bettor,
+      creator,
+      treasuryMint,
+    }: {
+      bettor: PublicKey;
+      creator?: PublicKey;
+      treasuryMint: PublicKey;
+    },
+    {
+      amount,
+      bets,
+    }: {
+      amount: number;
+      bets: number;
+    }
+  ) {
+    invariant(bets <= 256, "bets should be an 8-bit bitmask");
+    const [auctionHouse] = await this.findAuctionHousePda(
+      creator ?? this._authority,
+      treasuryMint
+    );
+    const ix = await placeBetIx(
+      {
+        auctionHouse,
+        bettor,
+        paymentAccount: await getWalletIfNativeElseAta(bettor, treasuryMint),
+        treasuryMint,
+      },
+      {
+        amount,
+        bets,
         program: this.program,
       }
     );

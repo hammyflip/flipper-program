@@ -33,6 +33,8 @@ pub mod flipper_program {
         treasury_bump: u8,
         fee_basis_points: u16,
     ) -> Result<()> {
+        // TODO: add some validation on authority. We should ony allow KNOWN authorities.
+
         let payer = &ctx.accounts.payer;
         let authority = &ctx.accounts.authority;
         let treasury_mint = &ctx.accounts.treasury_mint;
@@ -144,7 +146,7 @@ pub mod flipper_program {
         let is_native = treasury_mint.key() == spl_token::native_mint::id();
 
         if bettor_info.amount == 0 {
-            return Err(ErrorCode::InvalidBettorInfoAmount.into());
+            return Err(ErrorCode::InvalidBetAmount.into());
         }
 
         let amount = bettor_info.amount;
@@ -243,14 +245,22 @@ pub mod flipper_program {
     pub fn place_bet<'info>(
         ctx: Context<'_, '_, '_, 'info, PlaceBet<'info>>,
         bettor_info_payment_account_bump: u8,
+        bets: u8,
+        amount: u64,
     ) -> Result<()> {
+        if amount == 0 {
+            return Err(ErrorCode::InvalidBetAmount.into());
+        }
+
         let bettor = &ctx.accounts.bettor;
-        let bettor_info = &ctx.accounts.bettor_info;
+        let bettor_info = &mut ctx.accounts.bettor_info;
         let bettor_info_payment_account = &ctx.accounts.bettor_info_payment_account;
         let payment_account = &ctx.accounts.payment_account;
         let treasury_mint = &ctx.accounts.treasury_mint;
         let token_program = &ctx.accounts.token_program;
         let transfer_authority = &ctx.accounts.transfer_authority;
+        let auction_house = &ctx.accounts.auction_house;
+        let auction_house_treasury = &ctx.accounts.auction_house_treasury;
 
         let system_program = &ctx.accounts.system_program;
         let rent = &ctx.accounts.rent;
@@ -278,6 +288,15 @@ pub mod flipper_program {
             is_native,
         )?;
 
+        if bettor_info.amount > 0 {
+            return Err(ErrorCode::MultipleBetsNotAllowed.into());
+        }
+        bettor_info.amount = amount;
+        bettor_info.bets = bets;
+
+        let fee_basis_points: u64 = auction_house.fee_basis_points.into();
+        let fee_amount = (bettor_info.amount * fee_basis_points) / 10_000;
+
         if is_native {
             assert_keys_equal(bettor.key(), payment_account.key())?;
 
@@ -294,7 +313,18 @@ pub mod flipper_program {
                 ],
             )?;
 
-            // TODO: send fees to treasury
+            invoke(
+                &system_instruction::transfer(
+                    &payment_account.key(),
+                    &auction_house_treasury.key(),
+                    fee_amount,
+                ),
+                &[
+                    payment_account.to_account_info(),
+                    auction_house_treasury.to_account_info(),
+                    system_program.to_account_info(),
+                ],
+            )?;
         } else {
             invoke(
                 &spl_token::instruction::transfer(
@@ -313,7 +343,22 @@ pub mod flipper_program {
                 ],
             )?;
 
-            // TODO: send fees to treasury
+            invoke(
+                &spl_token::instruction::transfer(
+                    &token_program.key(),
+                    &payment_account.key(),
+                    &auction_house_treasury.key(),
+                    &transfer_authority.key(),
+                    &[],
+                    fee_amount,
+                )?,
+                &[
+                    transfer_authority.to_account_info(),
+                    payment_account.to_account_info(),
+                    auction_house_treasury.to_account_info(),
+                    token_program.to_account_info(),
+                ],
+            )?;
         }
 
         Ok(())
@@ -515,7 +560,7 @@ pub struct Payout<'info> {
 pub struct PlaceBet<'info> {
     #[account(mut)]
     bettor: Signer<'info>,
-    #[account(seeds=[BETTOR_INFO.as_bytes(), bettor.key().as_ref(), treasury_mint.key().as_ref()], bump)]
+    #[account(mut, seeds=[BETTOR_INFO.as_bytes(), bettor.key().as_ref(), treasury_mint.key().as_ref()], bump)]
     bettor_info: Account<'info, BettorInfo>,
     treasury_mint: Account<'info, Mint>,
     #[account(mut, seeds=[BETTOR_INFO_PAYMENT_ACCOUNT.as_bytes(), bettor.key().as_ref(), treasury_mint.key().as_ref()], bump=bettor_info_payment_account_bump)]
@@ -523,6 +568,11 @@ pub struct PlaceBet<'info> {
     #[account(mut)]
     payment_account: UncheckedAccount<'info>,
     transfer_authority: UncheckedAccount<'info>,
+
+    #[account(seeds=[AUCTION_HOUSE.as_bytes(), auction_house.creator.as_ref(), treasury_mint.key().as_ref()], bump=auction_house.bump, has_one=treasury_mint)]
+    auction_house: Account<'info, AuctionHouse>,
+    #[account(mut, seeds=[TREASURY.as_bytes(), auction_house.key().as_ref()], bump=auction_house.treasury_bump)]
+    auction_house_treasury: UncheckedAccount<'info>,
 
     system_program: Program<'info, System>,
     rent: Sysvar<'info, Rent>,
@@ -593,6 +643,7 @@ pub struct BettorInfo {
     pub bets: u8,
     // Bitmask of coin flip results. Least significant bit represents the first flip.
     pub results: u8,
+    // TODO: need to add num flips
 }
 
 pub const BETTOR_INFO_SIZE: usize = 8 + // discriminator
@@ -609,12 +660,14 @@ pub const BETTOR_INFO_SIZE: usize = 8 + // discriminator
 pub enum ErrorCode {
     #[msg("BP must be less than or equal to 10000")]
     InvalidBasisPoints,
-    #[msg("BetterInfo amount must be greater than 0")]
-    InvalidBettorInfoAmount,
     #[msg("UninitializedAccount")]
     UninitializedAccount,
     #[msg("PublicKeyMismatch")]
     PublicKeyMismatch,
     #[msg("IncorrectOwner")]
     IncorrectOwner,
+    #[msg("You are only allowed to place one bet at a time")]
+    MultipleBetsNotAllowed,
+    #[msg("Bet amounts must be greater than 0")]
+    InvalidBetAmount,
 }
