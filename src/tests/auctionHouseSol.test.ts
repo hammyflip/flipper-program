@@ -132,7 +132,7 @@ describe("Auction House tests, treasury mint = SOL", () => {
       AUTHORITY.publicKey
     );
 
-    expect(treasuryLamportsBefore - treasuryLamportsAfter).toEqual(amount);
+    expect(treasuryLamportsAfter - treasuryLamportsBefore).toEqual(-amount);
     expect(authorityLamportsAfter - authorityLamportsBefore).toEqual(amount);
   });
 });

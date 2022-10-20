@@ -4,6 +4,7 @@ import { Flipper, FLIPPER_IDL, FlipperProgram } from "generated";
 import createAuctionHouseIx from "sdk/instructions/createAuctionHouseIx";
 import createBettorInfoIx from "sdk/instructions/createBettorInfoIx";
 import flipIx from "sdk/instructions/flipIx";
+import payoutIx from "sdk/instructions/payoutIx";
 import placeBetIx from "sdk/instructions/placeBetIx";
 import updateAuctionHouseIx from "sdk/instructions/updateAuctionHouseIx";
 import withdrawFromTreasuryIx from "sdk/instructions/withdrawFromTreasuryIx";
@@ -142,6 +143,37 @@ export default class FlipperSdk {
       {
         program: this.program,
         results,
+      }
+    );
+    return ixToTx(ix);
+  }
+
+  async payoutTx({
+    bettor,
+    creator,
+    treasuryMint,
+  }: {
+    bettor: PublicKey;
+    creator?: PublicKey;
+    treasuryMint: PublicKey;
+  }) {
+    const [auctionHouse] = await this.findAuctionHousePda(
+      creator ?? this._authority,
+      treasuryMint
+    );
+    const ix = await payoutIx(
+      {
+        auctionHouse,
+        authority: this._authority,
+        bettor,
+        bettorPaymentAccount: await getWalletIfNativeElseAta(
+          bettor,
+          treasuryMint
+        ),
+        treasuryMint,
+      },
+      {
+        program: this.program,
       }
     );
     return ixToTx(ix);

@@ -333,7 +333,7 @@ pub mod flipper_program {
         if bettor_info.amount > 0 {
             return Err(ErrorCode::MultipleBetsNotAllowed.into());
         }
-        if num_flips == 0 || num_flips > 8 {
+        if num_flips != 1 {
             return Err(ErrorCode::InvalidNumFlips.into());
         }
         bettor_info.amount = amount;
@@ -720,6 +720,6 @@ pub enum ErrorCode {
     MultipleBetsNotAllowed,
     #[msg("Bet amounts must be greater than 0")]
     InvalidBetAmount,
-    #[msg("Number of flips must be at least 1 and at most 8")]
+    #[msg("Number of flips must equal 1")]
     InvalidNumFlips,
 }
