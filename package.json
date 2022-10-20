@@ -1,6 +1,20 @@
 {
+  "name": "@hammyflip/flipper-sdk",
+  "version": "0.0.1",
+  "description": "Client SDK for the flipper program.",
+  "repository": "https://github.com/hammyflip/flipper-program",
+  "license": "UNLICENSED",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "@hammyflip:registry": "https://npm.pkg.github.com"
+  },
   "scripts": {
     "build-program": "anchor build --skip-lint",
+    "build-sdk": "tsc -P tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "deploy-program": "./scripts/deploy-program.sh",
     "eslint": "eslint --cache 'src/**/*.ts'",
     "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",

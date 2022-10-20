@@ -1,0 +1,71 @@
+name: Release Packages
+
+on:
+  workflow_dispatch: {}
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  publish-ts-sdk:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          cache: "yarn"
+          node-version: "16.14.2"
+          registry-url: https://npm.pkg.github.com/
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build TS SDK
+        run: yarn build-sdk
+
+      - name: Publish npm package
+        run: yarn npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.HAMMYFLIP_PAT}}
+
+  release-binaries:
+    runs-on: ubuntu-latest
+    name: Release verifiable binaries
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      # Needed for cargo install anchor-cli step
+      - name: Install libudev-dev
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libudev-dev
+
+      - name: Install avm
+        run: cargo install --git https://github.com/project-serum/anchor avm --locked --force
+
+      # The anchor-cli version should match the version program Anchor version
+      - name: Install Anchor version
+        run: avm install 0.24.2
+
+      - name: Build programs
+        run: anchor build --verifiable
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            target/deploy/*
+            target/idl/*
+            target/verifiable/*
