@@ -1,4 +1,9 @@
-import { DEVNET_ACCOUNTS, LOCALNET_ACCOUNTS, MAINNET_ACCOUNTS, TESTNET_ACCOUNTS } from "constants/AccountConstants";
+import {
+  DEVNET_ACCOUNTS,
+  LOCALNET_ACCOUNTS,
+  MAINNET_ACCOUNTS,
+  TESTNET_ACCOUNTS,
+} from "constants/AccountConstants";
 import Environment from "types/enums/Environment";
 import assertUnreachable from "utils/assertUnreachable";
 

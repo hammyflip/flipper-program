@@ -297,7 +297,7 @@ pub mod flipper_program {
         let bettor = &ctx.accounts.bettor;
         let bettor_info = &mut ctx.accounts.bettor_info;
         let bettor_info_payment_account = &ctx.accounts.bettor_info_payment_account;
-        let payment_account = &ctx.accounts.payment_account;
+        let bettor_payment_account = &ctx.accounts.bettor_payment_account;
         let treasury_mint = &ctx.accounts.treasury_mint;
         let token_program = &ctx.accounts.token_program;
         let transfer_authority = &ctx.accounts.transfer_authority;
@@ -344,16 +344,16 @@ pub mod flipper_program {
         let fee_amount = (bettor_info.amount * fee_basis_points) / 10_000;
 
         if is_native {
-            assert_keys_equal(bettor.key(), payment_account.key())?;
+            assert_keys_equal(bettor.key(), bettor_payment_account.key())?;
 
             invoke(
                 &system_instruction::transfer(
-                    &payment_account.key(),
+                    &bettor_payment_account.key(),
                     &bettor_info_payment_account.key(),
                     bettor_info.amount,
                 ),
                 &[
-                    payment_account.to_account_info(),
+                    bettor_payment_account.to_account_info(),
                     bettor_info_payment_account.to_account_info(),
                     system_program.to_account_info(),
                 ],
@@ -361,12 +361,12 @@ pub mod flipper_program {
 
             invoke(
                 &system_instruction::transfer(
-                    &payment_account.key(),
+                    &bettor_payment_account.key(),
                     &auction_house_treasury.key(),
                     fee_amount,
                 ),
                 &[
-                    payment_account.to_account_info(),
+                    bettor_payment_account.to_account_info(),
                     auction_house_treasury.to_account_info(),
                     system_program.to_account_info(),
                 ],
@@ -375,7 +375,7 @@ pub mod flipper_program {
             invoke(
                 &spl_token::instruction::transfer(
                     &token_program.key(),
-                    &payment_account.key(),
+                    &bettor_payment_account.key(),
                     &bettor_info_payment_account.key(),
                     &transfer_authority.key(),
                     &[],
@@ -383,7 +383,7 @@ pub mod flipper_program {
                 )?,
                 &[
                     transfer_authority.to_account_info(),
-                    payment_account.to_account_info(),
+                    bettor_payment_account.to_account_info(),
                     bettor_info_payment_account.to_account_info(),
                     token_program.to_account_info(),
                 ],
@@ -392,7 +392,7 @@ pub mod flipper_program {
             invoke(
                 &spl_token::instruction::transfer(
                     &token_program.key(),
-                    &payment_account.key(),
+                    &bettor_payment_account.key(),
                     &auction_house_treasury.key(),
                     &transfer_authority.key(),
                     &[],
@@ -400,7 +400,7 @@ pub mod flipper_program {
                 )?,
                 &[
                     transfer_authority.to_account_info(),
-                    payment_account.to_account_info(),
+                    bettor_payment_account.to_account_info(),
                     auction_house_treasury.to_account_info(),
                     token_program.to_account_info(),
                 ],
@@ -538,22 +538,22 @@ pub mod flipper_program {
 #[derive(Accounts)]
 #[instruction(auction_house_bump: u8, treasury_bump: u8)]
 pub struct CreateAuctionHouse<'info> {
+    #[account(init, seeds=[AUCTION_HOUSE.as_bytes(), authority.key().as_ref(), treasury_mint.key().as_ref()], bump, space=AUCTION_HOUSE_SIZE, payer=payer)]
+    auction_house: Account<'info, AuctionHouse>,
+    #[account(mut, seeds=[TREASURY.as_bytes(), auction_house.key().as_ref()], bump=treasury_bump)]
+    auction_house_treasury: UncheckedAccount<'info>,
+    authority: UncheckedAccount<'info>,
     #[account(mut)]
     payer: Signer<'info>,
-    authority: UncheckedAccount<'info>,
     treasury_mint: Account<'info, Mint>,
     #[account(mut)]
     treasury_withdrawal_destination: UncheckedAccount<'info>,
     treasury_withdrawal_destination_owner: UncheckedAccount<'info>,
 
-    #[account(init, seeds=[AUCTION_HOUSE.as_bytes(), authority.key().as_ref(), treasury_mint.key().as_ref()], bump, space=AUCTION_HOUSE_SIZE, payer=payer)]
-    auction_house: Account<'info, AuctionHouse>,
-    #[account(mut, seeds=[TREASURY.as_bytes(), auction_house.key().as_ref()], bump=treasury_bump)]
-    auction_house_treasury: UncheckedAccount<'info>,
-
-    system_program: Program<'info, System>,
     ata_program: Program<'info, AssociatedToken>,
+    system_program: Program<'info, System>,
     token_program: Program<'info, Token>,
+
     rent: Sysvar<'info, Rent>,
 }
 
@@ -566,38 +566,38 @@ pub struct CreateBettorInfo<'info> {
     treasury_mint: Account<'info, Mint>,
 
     system_program: Program<'info, System>,
+
     rent: Sysvar<'info, Rent>,
 }
 
 #[derive(Accounts)]
 pub struct Flip<'info> {
-    authority: Signer<'info>,
-    bettor: UncheckedAccount<'info>,
-    treasury_mint: Account<'info, Mint>,
-    #[account(mut, seeds=[BETTOR_INFO.as_bytes(), bettor.key().as_ref(), treasury_mint.key().as_ref()], bump)]
-    bettor_info: Account<'info, BettorInfo>,
     #[account(seeds=[AUCTION_HOUSE.as_bytes(), auction_house.creator.as_ref(), treasury_mint.key().as_ref()], bump=auction_house.bump, has_one=authority, has_one=treasury_mint)]
     auction_house: Account<'info, AuctionHouse>,
+    authority: Signer<'info>,
+    bettor: UncheckedAccount<'info>,
+    #[account(mut, seeds=[BETTOR_INFO.as_bytes(), bettor.key().as_ref(), treasury_mint.key().as_ref()], bump)]
+    bettor_info: Account<'info, BettorInfo>,
+    treasury_mint: Account<'info, Mint>,
 }
 
 #[derive(Accounts)]
 #[instruction(bettor_info_payment_account_bump: u8)]
 pub struct Payout<'info> {
-    authority: Signer<'info>,
-    #[account(mut)]
-    bettor: UncheckedAccount<'info>,
-    #[account(mut)]
-    bettor_payment_account: UncheckedAccount<'info>,
-    treasury_mint: Account<'info, Mint>,
-    #[account(mut, seeds=[BETTOR_INFO.as_bytes(), bettor.key().as_ref(), treasury_mint.key().as_ref()], bump)]
-    bettor_info: Account<'info, BettorInfo>,
-    #[account(mut, seeds=[BETTOR_INFO_PAYMENT_ACCOUNT.as_bytes(), bettor.key().as_ref(), treasury_mint.key().as_ref()], bump=bettor_info_payment_account_bump)]
-    bettor_info_payment_account: UncheckedAccount<'info>,
-
     #[account(seeds=[AUCTION_HOUSE.as_bytes(), auction_house.creator.as_ref(), treasury_mint.key().as_ref()], bump=auction_house.bump, has_one=authority, has_one=treasury_mint)]
     auction_house: Account<'info, AuctionHouse>,
     #[account(mut, seeds=[TREASURY.as_bytes(), auction_house.key().as_ref()], bump=auction_house.treasury_bump)]
     auction_house_treasury: UncheckedAccount<'info>,
+    authority: Signer<'info>,
+    #[account(mut)]
+    bettor: UncheckedAccount<'info>,
+    #[account(mut, seeds=[BETTOR_INFO.as_bytes(), bettor.key().as_ref(), treasury_mint.key().as_ref()], bump)]
+    bettor_info: Account<'info, BettorInfo>,
+    #[account(mut, seeds=[BETTOR_INFO_PAYMENT_ACCOUNT.as_bytes(), bettor.key().as_ref(), treasury_mint.key().as_ref()], bump=bettor_info_payment_account_bump)]
+    bettor_info_payment_account: UncheckedAccount<'info>,
+    #[account(mut)]
+    bettor_payment_account: UncheckedAccount<'info>,
+    treasury_mint: Account<'info, Mint>,
 
     system_program: Program<'info, System>,
     token_program: Program<'info, Token>,
@@ -606,25 +606,25 @@ pub struct Payout<'info> {
 #[derive(Accounts)]
 #[instruction(bettor_info_payment_account_bump: u8)]
 pub struct PlaceBet<'info> {
-    #[account(mut)]
-    bettor: Signer<'info>,
-    #[account(mut, seeds=[BETTOR_INFO.as_bytes(), bettor.key().as_ref(), treasury_mint.key().as_ref()], bump)]
-    bettor_info: Account<'info, BettorInfo>,
-    treasury_mint: Account<'info, Mint>,
-    #[account(mut, seeds=[BETTOR_INFO_PAYMENT_ACCOUNT.as_bytes(), bettor.key().as_ref(), treasury_mint.key().as_ref()], bump=bettor_info_payment_account_bump)]
-    bettor_info_payment_account: UncheckedAccount<'info>,
-    #[account(mut)]
-    payment_account: UncheckedAccount<'info>,
-    transfer_authority: UncheckedAccount<'info>,
-
     #[account(seeds=[AUCTION_HOUSE.as_bytes(), auction_house.creator.as_ref(), treasury_mint.key().as_ref()], bump=auction_house.bump, has_one=treasury_mint)]
     auction_house: Account<'info, AuctionHouse>,
     #[account(mut, seeds=[TREASURY.as_bytes(), auction_house.key().as_ref()], bump=auction_house.treasury_bump)]
     auction_house_treasury: UncheckedAccount<'info>,
+    #[account(mut)]
+    bettor: Signer<'info>,
+    #[account(mut, seeds=[BETTOR_INFO.as_bytes(), bettor.key().as_ref(), treasury_mint.key().as_ref()], bump)]
+    bettor_info: Account<'info, BettorInfo>,
+    #[account(mut, seeds=[BETTOR_INFO_PAYMENT_ACCOUNT.as_bytes(), bettor.key().as_ref(), treasury_mint.key().as_ref()], bump=bettor_info_payment_account_bump)]
+    bettor_info_payment_account: UncheckedAccount<'info>,
+    #[account(mut)]
+    bettor_payment_account: UncheckedAccount<'info>,
+    transfer_authority: UncheckedAccount<'info>,
+    treasury_mint: Account<'info, Mint>,
 
     system_program: Program<'info, System>,
-    rent: Sysvar<'info, Rent>,
     token_program: Program<'info, Token>,
+
+    rent: Sysvar<'info, Rent>,
 }
 
 #[derive(Accounts)]
@@ -645,16 +645,17 @@ pub struct UpdateAuctionHouse<'info> {
 
 #[derive(Accounts)]
 pub struct WithdrawFromTreasury<'info> {
-    treasury_mint: Account<'info, Mint>,
-    authority: Signer<'info>,
-    #[account(mut)]
-    treasury_withdrawal_destination: UncheckedAccount<'info>,
     #[account(mut, seeds=[TREASURY.as_bytes(), auction_house.key().as_ref()], bump=auction_house.treasury_bump)]
     auction_house_treasury: UncheckedAccount<'info>,
     #[account(mut, seeds=[AUCTION_HOUSE.as_bytes(), auction_house.creator.as_ref(), treasury_mint.key().as_ref()], bump=auction_house.bump, has_one=authority, has_one=treasury_mint, has_one=treasury_withdrawal_destination, has_one=auction_house_treasury)]
     auction_house: Account<'info, AuctionHouse>,
-    token_program: Program<'info, Token>,
+    authority: Signer<'info>,
+    treasury_mint: Account<'info, Mint>,
+    #[account(mut)]
+    treasury_withdrawal_destination: UncheckedAccount<'info>,
+
     system_program: Program<'info, System>,
+    token_program: Program<'info, Token>,
 }
 
 //

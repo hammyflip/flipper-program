@@ -34,16 +34,16 @@ export default async function updateAuctionHouseIx(
   return program.methods
     .updateAuctionHouse(feeBasisPoints)
     .accounts({
+      ataProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
       auctionHouse,
       authority,
       newAuthority,
+      rent: web3.SYSVAR_RENT_PUBKEY,
+      systemProgram: web3.SystemProgram.programId,
+      tokenProgram: TOKEN_PROGRAM_ID,
       treasuryMint,
       treasuryWithdrawalDestination,
       treasuryWithdrawalDestinationOwner,
-      ataProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-      systemProgram: web3.SystemProgram.programId,
-      tokenProgram: TOKEN_PROGRAM_ID,
-      rent: web3.SYSVAR_RENT_PUBKEY,
     })
     .instruction();
 }

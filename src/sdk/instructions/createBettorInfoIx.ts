@@ -27,9 +27,9 @@ export default async function createBettorInfoIx(
     .accounts({
       bettor,
       bettorInfo,
-      treasuryMint,
-      systemProgram: web3.SystemProgram.programId,
       rent: web3.SYSVAR_RENT_PUBKEY,
+      systemProgram: web3.SystemProgram.programId,
+      treasuryMint,
     })
     .instruction();
 }

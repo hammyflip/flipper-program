@@ -10,8 +10,8 @@ type Accounts = {
 };
 
 type Args = {
-  results: number;
   program: FlipperProgram;
+  results: number;
 };
 
 export default async function flipIx(

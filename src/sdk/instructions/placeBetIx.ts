@@ -9,7 +9,7 @@ import findBettorInfoPda from "utils/pdas/findBettorInfoPda";
 type Accounts = {
   auctionHouse: PublicKey;
   bettor: PublicKey;
-  paymentAccount: PublicKey;
+  bettorPaymentAccount: PublicKey;
   treasuryMint: PublicKey;
 };
 
@@ -21,7 +21,7 @@ type Args = {
 };
 
 export default async function placeBetIx(
-  { auctionHouse, bettor, paymentAccount, treasuryMint }: Accounts,
+  { auctionHouse, bettor, bettorPaymentAccount, treasuryMint }: Accounts,
   { amount, bets, numFlips, program }: Args
 ): Promise<TransactionInstruction> {
   const [auctionHouseTreasury] = await findAuctionHouseTreasuryPda(
@@ -47,13 +47,13 @@ export default async function placeBetIx(
       auctionHouseTreasury,
       bettor,
       bettorInfo,
-      treasuryMint,
       bettorInfoPaymentAccount,
-      paymentAccount,
-      transferAuthority: bettor,
+      bettorPaymentAccount,
+      rent: web3.SYSVAR_RENT_PUBKEY,
       systemProgram: web3.SystemProgram.programId,
       tokenProgram: TOKEN_PROGRAM_ID,
-      rent: web3.SYSVAR_RENT_PUBKEY,
+      transferAuthority: bettor,
+      treasuryMint,
     })
     .instruction();
 }

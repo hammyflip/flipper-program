@@ -1,4 +1,4 @@
-import { setProvider, AnchorProvider } from "@project-serum/anchor";
+import { AnchorProvider, setProvider } from "@project-serum/anchor";
 import { Keypair } from "@solana/web3.js";
 import { WRAPPED_SOL_MINT } from "constants/AccountConstants";
 import FlipperSdk from "sdk/FlipperSdk";

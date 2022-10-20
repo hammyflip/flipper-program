@@ -1,5 +1,5 @@
 import { PublicKey } from "@solana/web3.js";
-import { BETTOR_INFO, BETTOR_INFO_PAYMENT_ACCOUNT } from "constants/PdaConstants";
+import { BETTOR_INFO_PAYMENT_ACCOUNT } from "constants/PdaConstants";
 
 export default async function findBettorInfoPaymentAccountPda(
   bettor: PublicKey,
@@ -7,7 +7,11 @@ export default async function findBettorInfoPaymentAccountPda(
   programId: PublicKey
 ) {
   return PublicKey.findProgramAddress(
-    [Buffer.from(BETTOR_INFO_PAYMENT_ACCOUNT), bettor.toBuffer(), treasuryMint.toBuffer()],
+    [
+      Buffer.from(BETTOR_INFO_PAYMENT_ACCOUNT),
+      bettor.toBuffer(),
+      treasuryMint.toBuffer(),
+    ],
     programId
   );
 }

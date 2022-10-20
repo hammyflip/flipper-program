@@ -1,6 +1,6 @@
-import { AnchorProvider, Idl, Program, web3 } from "@project-serum/anchor";
+import { AnchorProvider, Idl, Program } from "@project-serum/anchor";
 import { Connection, PublicKey } from "@solana/web3.js";
-import { Flipper, FlipperProgram, FLIPPER_IDL } from "generated";
+import { Flipper, FLIPPER_IDL, FlipperProgram } from "generated";
 import createAuctionHouseIx from "sdk/instructions/createAuctionHouseIx";
 import createBettorInfoIx from "sdk/instructions/createBettorInfoIx";
 import flipIx from "sdk/instructions/flipIx";
@@ -66,8 +66,8 @@ export default class FlipperSdk {
       treasuryWithdrawalDestination,
       treasuryWithdrawalDestinationOwner,
     }: {
-      treasuryMint: PublicKey;
       payer: PublicKey;
+      treasuryMint: PublicKey;
       treasuryWithdrawalDestination: PublicKey;
       treasuryWithdrawalDestinationOwner: PublicKey;
     },
@@ -140,8 +140,8 @@ export default class FlipperSdk {
         treasuryMint,
       },
       {
-        results,
         program: this.program,
+        results,
       }
     );
     return ixToTx(ix);
@@ -176,7 +176,10 @@ export default class FlipperSdk {
       {
         auctionHouse,
         bettor,
-        paymentAccount: await getWalletIfNativeElseAta(bettor, treasuryMint),
+        bettorPaymentAccount: await getWalletIfNativeElseAta(
+          bettor,
+          treasuryMint
+        ),
         treasuryMint,
       },
       {
