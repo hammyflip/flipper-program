@@ -4,6 +4,6 @@ import { Undef } from "types/UtilityTypes";
 export default async function getAccountLamports(
   connection: Connection,
   pubkey: PublicKey
-): Promise<Undef<number>> {
-  return (await connection.getAccountInfo(pubkey))?.lamports;
+): Promise<number> {
+  return (await connection.getAccountInfo(pubkey))!.lamports;
 }
