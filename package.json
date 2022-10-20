@@ -1,6 +1,6 @@
 {
   "name": "@hammyflip/flipper-sdk",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Client SDK for the flipper program.",
   "repository": "https://github.com/hammyflip/flipper-program",
   "license": "UNLICENSED",
