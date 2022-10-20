@@ -16,7 +16,7 @@ use {
     },
 };
 
-declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
+declare_id!("hamRNY1AjpqcjKqHHMi6ump7rSJafQSKKVKCFzC5oQ7");
 
 const AUCTION_HOUSE: &str = "auction_house";
 const BETTOR_INFO: &str = "bettor_info";

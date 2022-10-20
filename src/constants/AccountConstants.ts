@@ -7,28 +7,25 @@ type Accounts = {
 
 export const LOCALNET_ACCOUNTS: Accounts = {
   authority: PublicKey.default,
-  programId: new PublicKey("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"),
+  programId: new PublicKey("hamRNY1AjpqcjKqHHMi6ump7rSJafQSKKVKCFzC5oQ7"),
 };
 
 export const TESTNET_ACCOUNTS: Accounts = {
   // TODO: fill in
   authority: new PublicKey("dcfg6CukQFmVzXdYu31wmTM6d6rvVXhnMEn1dzpCGco"),
-  // TODO: fill in
-  programId: new PublicKey("dgumN6t8fDjoHAbb1K4ySqcP2sWJHaqX9JLNQMDPT9U"),
+  programId: new PublicKey("hamRNY1AjpqcjKqHHMi6ump7rSJafQSKKVKCFzC5oQ7"),
 };
 
 export const DEVNET_ACCOUNTS: Accounts = {
   // TODO: fill in
   authority: new PublicKey("dcfg6CukQFmVzXdYu31wmTM6d6rvVXhnMEn1dzpCGco"),
-  // TODO: fill in
-  programId: new PublicKey("dgumN6t8fDjoHAbb1K4ySqcP2sWJHaqX9JLNQMDPT9U"),
+  programId: new PublicKey("hamRNY1AjpqcjKqHHMi6ump7rSJafQSKKVKCFzC5oQ7"),
 };
 
 export const MAINNET_ACCOUNTS: Accounts = {
   // TODO: fill in
   authority: new PublicKey("2VC3M7t1Uj63yxPvrFKNCa9A14F3AVXujdjTHUATzxb8"),
-  // TODO: fill in
-  programId: new PublicKey("gum8aDxTHP5HSXxQzVHDdSQJGUQFLreGDX2cUa133tk"),
+  programId: new PublicKey("hamRNY1AjpqcjKqHHMi6ump7rSJafQSKKVKCFzC5oQ7"),
 };
 
 export const WRAPPED_SOL_MINT = new PublicKey(

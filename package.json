@@ -1,5 +1,7 @@
 {
   "scripts": {
+    "build-program": "anchor build --skip-lint",
+    "deploy-program": "./scripts/deploy-program.sh",
     "eslint": "eslint --cache 'src/**/*.ts'",
     "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
     "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check",
