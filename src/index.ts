@@ -7,11 +7,14 @@ import parsePlaceBetIx from "parse/parsePlaceBetIx";
 
 import Environment from "types/enums/Environment";
 
+import { AUTHORITIES } from "constants/AccountConstants";
+
 export {
   parseCreateBettorInfoIx,
   parseFlipIx,
   parsePayoutIx,
   parsePlaceBetIx,
+  AUTHORITIES,
   Environment,
 };
 
