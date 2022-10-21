@@ -25,7 +25,6 @@ describe("Betting tests, treasury mint = SOL", () => {
   const sdk = new FlipperSdk({
     authority: AUTHORITY.publicKey,
     connection,
-    environment: Environment.Local,
     wallet,
   });
 

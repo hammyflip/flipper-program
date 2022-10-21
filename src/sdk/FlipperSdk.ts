@@ -1,5 +1,6 @@
 import { AnchorProvider, Idl, Program } from "@project-serum/anchor";
 import { Connection, PublicKey } from "@solana/web3.js";
+import { FLIPPER_PROGRAM_ID } from "constants/ProgramIds";
 import { Flipper, FLIPPER_IDL, FlipperProgram } from "generated";
 import createAuctionHouseIx from "sdk/instructions/createAuctionHouseIx";
 import createBettorInfoIx from "sdk/instructions/createBettorInfoIx";
@@ -10,8 +11,6 @@ import updateAuctionHouseIx from "sdk/instructions/updateAuctionHouseIx";
 import withdrawFromTreasuryIx from "sdk/instructions/withdrawFromTreasuryIx";
 import invariant from "tiny-invariant";
 import AnchorWallet from "types/AnchorWallet";
-import Environment from "types/enums/Environment";
-import getAccountsForEnvironment from "utils/getAccountsForEnvironment";
 import findAuctionHousePda from "utils/pdas/findAuctionHousePda";
 import findAuctionHouseTreasuryPda from "utils/pdas/findAuctionHouseTreasuryPda";
 import findBettorInfoPaymentAccountPda from "utils/pdas/findBettorInfoPaymentAccountPda";
@@ -22,8 +21,6 @@ import ixToTx from "utils/solana/ixToTx";
 export default class FlipperSdk {
   private _connection: Connection;
 
-  private _idl: Idl = FLIPPER_IDL;
-
   public program: FlipperProgram;
 
   private _authority: PublicKey;
@@ -31,19 +28,15 @@ export default class FlipperSdk {
   constructor({
     authority,
     connection,
-    environment,
     wallet,
   }: {
     authority: PublicKey;
     connection: Connection;
-    environment: Environment;
     wallet: AnchorWallet;
   }) {
     this._connection = connection;
 
-    const accounts = getAccountsForEnvironment(environment);
-
-    this._authority = authority ?? accounts.authority;
+    this._authority = authority ?? authority;
 
     const provider = new AnchorProvider(connection, wallet, {
       preflightCommitment: "recent",
@@ -51,7 +44,7 @@ export default class FlipperSdk {
 
     this.program = new Program<Flipper>(
       FLIPPER_IDL as any,
-      accounts.programId,
+      FLIPPER_PROGRAM_ID,
       provider
     );
   }

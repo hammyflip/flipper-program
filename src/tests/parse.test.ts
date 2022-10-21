@@ -34,7 +34,6 @@ setProvider(provider);
 const sdk = new FlipperSdk({
   authority: AUTHORITY.publicKey,
   connection,
-  environment: Environment.Local,
   wallet,
 });
 

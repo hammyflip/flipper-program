@@ -5,7 +5,6 @@ import FlipperSdk from "sdk/FlipperSdk";
 import getAccountLamports from "tests/utils/getAccountLamports";
 import requestAirdrops from "tests/utils/requestAirdrops";
 import sendTransactionForTest from "tests/utils/sendTransactionForTest";
-import Environment from "types/enums/Environment";
 
 const AUTHORITY = Keypair.generate();
 const NEW_AUTHORITY = Keypair.generate();
@@ -21,7 +20,6 @@ describe("Auction House tests, treasury mint = SOL", () => {
   const sdk = new FlipperSdk({
     authority: AUTHORITY.publicKey,
     connection,
-    environment: Environment.Local,
     wallet,
   });
 
