@@ -1,7 +1,4 @@
-import {
-  ParsedTransactionWithMeta,
-  PartiallyDecodedInstruction,
-} from "@solana/web3.js";
+import { PartiallyDecodedInstruction } from "@solana/web3.js";
 import decodeFlipperIx from "parse/decodeFlipperIx";
 
 const IX_NAME = "createBettorInfo";
@@ -9,7 +6,7 @@ const IX_NAME = "createBettorInfo";
 const BETTOR_ACCOUNT_POSITION = 0;
 const TREASURY_MINT_ACCOUNT_POSITION = 2;
 
-export default function parseCreateBettorInfoTx(
+export default function parseCreateBettorInfoIx(
   ix: PartiallyDecodedInstruction
 ) {
   const decodedIx = decodeFlipperIx(ix);
@@ -18,7 +15,9 @@ export default function parseCreateBettorInfoTx(
   }
 
   return {
-    bettor: ix.accounts[BETTOR_ACCOUNT_POSITION],
-    treasuryMint: ix.accounts[TREASURY_MINT_ACCOUNT_POSITION],
+    accounts: {
+      bettor: ix.accounts[BETTOR_ACCOUNT_POSITION],
+      treasuryMint: ix.accounts[TREASURY_MINT_ACCOUNT_POSITION],
+    },
   };
 }
