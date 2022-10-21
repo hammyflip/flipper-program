@@ -106,6 +106,38 @@ export default class FlipperSdk {
     return ixToTx(ix);
   }
 
+  async createBettorInfoIfNeededTx({
+    bettor,
+    treasuryMint,
+  }: {
+    bettor: PublicKey;
+    treasuryMint: PublicKey;
+  }) {
+    const [bettorInfo] = await findBettorInfoPda(
+      bettor,
+      treasuryMint,
+      this.program.programId
+    );
+    const bettorInfoAccountInfo = await this._connection.getAccountInfo(
+      bettorInfo
+    );
+    if (bettorInfoAccountInfo != null) {
+      // Account already exists, no need to create it
+      return null;
+    }
+
+    const ix = await createBettorInfoIx(
+      {
+        bettor,
+        treasuryMint,
+      },
+      {
+        program: this.program,
+      }
+    );
+    return ixToTx(ix);
+  }
+
   async flipTx(
     {
       bettor,
