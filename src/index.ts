@@ -5,6 +5,14 @@ import parseFlipIx from "parse/parseFlipIx";
 import parsePayoutIx from "parse/parsePayoutIx";
 import parsePlaceBetIx from "parse/parsePlaceBetIx";
 
-export { parseCreateBettorInfoIx, parseFlipIx, parsePayoutIx, parsePlaceBetIx };
+import Environment from "types/enums/Environment";
+
+export {
+  parseCreateBettorInfoIx,
+  parseFlipIx,
+  parsePayoutIx,
+  parsePlaceBetIx,
+  Environment,
+};
 
 export default FlipperSdk;
