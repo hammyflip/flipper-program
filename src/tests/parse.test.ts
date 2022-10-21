@@ -7,6 +7,7 @@ import {
 } from "@solana/web3.js";
 import { WRAPPED_SOL_MINT } from "constants/AccountConstants";
 import parseCreateBettorInfoTx from "parse/parseCreateBettorInfoIx";
+import parseFlipIx from "parse/parseFlipIx";
 import parsePlaceBetIx from "parse/parsePlaceBetIx";
 import FlipperSdk from "sdk/FlipperSdk";
 import requestAirdrops from "tests/utils/requestAirdrops";
@@ -118,5 +119,33 @@ describe("Instruction parsing tests", () => {
     expect(ixData.amount).toEqual(AMOUNT);
     expect(ixData.bets).toEqual(bets);
     expect(ixData.numFlips).toEqual(numFlips);
+  });
+
+  it("Parse flip ix", async () => {
+    const results = 1;
+
+    const tx = await sdk.flipTx(
+      {
+        bettor: USER.publicKey,
+        treasuryMint: TREASURY_MINT,
+      },
+      {
+        results,
+      }
+    );
+    const txid = await sendTransactionForTest(connection, tx, [AUTHORITY]);
+    const ix = await getFirstAndOnlyIx(txid);
+    const parsedIx = parseFlipIx(ix as PartiallyDecodedInstruction);
+
+    expect(parsedIx).not.toBeNull();
+    invariant(parsedIx != null);
+
+    const { accounts: ixAccounts, data: ixData } = parsedIx;
+    expect(ixAccounts.bettor.toString()).toEqual(USER.publicKey.toString());
+    expect(ixAccounts.treasuryMint.toString()).toEqual(
+      TREASURY_MINT.toString()
+    );
+
+    expect(ixData.results).toEqual(results);
   });
 });
