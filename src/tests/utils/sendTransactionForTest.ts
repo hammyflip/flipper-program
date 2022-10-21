@@ -25,7 +25,7 @@ export default async function sendTransactionForTest(
       connection,
       transaction,
       signers,
-      options
+      options ?? { commitment: "confirmed" }
     );
   } catch (err) {
     if (IS_DEBUG) {
