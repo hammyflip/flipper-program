@@ -1,13 +1,13 @@
 import { PartiallyDecodedInstruction } from "@solana/web3.js";
 import decodeFlipperIx from "parse/decodeFlipperIx";
 
-const IX_NAME = "flip";
+const IX_NAME = "payout";
 
 const AUCTION_HOUSE_ACCOUNT_POSITION = 0;
-const BETTOR_ACCOUNT_POSITION = 2;
-const TREASURY_MINT_ACCOUNT_POSITION = 4;
+const BETTOR_ACCOUNT_POSITION = 3;
+const TREASURY_MINT_ACCOUNT_POSITION = 7;
 
-export default function parseFlipIx(ix: PartiallyDecodedInstruction) {
+export default function parsePayoutIx(ix: PartiallyDecodedInstruction) {
   const decodedIx = decodeFlipperIx(ix);
   if (decodedIx == null || decodedIx.name !== IX_NAME) {
     return null;
@@ -22,7 +22,6 @@ export default function parseFlipIx(ix: PartiallyDecodedInstruction) {
       treasuryMint: ix.accounts[TREASURY_MINT_ACCOUNT_POSITION],
     },
     data: {
-      bets: ixData.bets,
       results: ixData.results,
     },
   };

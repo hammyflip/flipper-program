@@ -24,8 +24,10 @@ export default async function flipIx(
     program.programId
   );
 
+  const bettorInfoAccount = await program.account.bettorInfo.fetch(bettorInfo);
+
   return program.methods
-    .flip(results)
+    .flip(bettorInfoAccount.bets, results)
     .accounts({
       auctionHouse,
       authority,

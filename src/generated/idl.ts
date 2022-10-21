@@ -100,8 +100,13 @@ const FLIPPER_IDL: Idl = {
     },
     {
       code: 6006,
-      msg: "Number of flips must be at least 1 and at most 8",
+      msg: "Number of flips must equal 1",
       name: "InvalidNumFlips",
+    },
+    {
+      code: 6007,
+      msg: "Invalid value for bets (may not match on-chain data)",
+      name: "InvalidBets",
     },
   ],
   instructions: [
@@ -239,6 +244,10 @@ const FLIPPER_IDL: Idl = {
         },
       ],
       args: [
+        {
+          name: "bets",
+          type: "u8",
+        },
         {
           name: "results",
           type: "u8",
@@ -495,9 +504,6 @@ const FLIPPER_IDL: Idl = {
       name: "withdrawFromTreasury",
     },
   ],
-  metadata: {
-    address: "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS",
-  },
   name: "flipper_program",
   version: "0.1.0",
 };

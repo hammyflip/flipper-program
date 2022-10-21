@@ -123,8 +123,17 @@ pub mod flipper_program {
         Ok(())
     }
 
-    pub fn flip<'info>(ctx: Context<'_, '_, '_, 'info, Flip<'info>>, results: u8) -> Result<()> {
+    pub fn flip<'info>(
+        ctx: Context<'_, '_, '_, 'info, Flip<'info>>,
+        bets: u8,
+        results: u8,
+    ) -> Result<()> {
         let bettor_info = &mut ctx.accounts.bettor_info;
+
+        if bettor_info.bets != bets {
+            return Err(ErrorCode::InvalidBets.into());
+        }
+
         bettor_info.results = results;
 
         Ok(())
@@ -722,4 +731,6 @@ pub enum ErrorCode {
     InvalidBetAmount,
     #[msg("Number of flips must equal 1")]
     InvalidNumFlips,
+    #[msg("Invalid value for bets (may not match on-chain data)")]
+    InvalidBets,
 }

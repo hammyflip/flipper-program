@@ -98,8 +98,13 @@ export type FlipperProgram = {
     },
     {
       code: 6006;
-      msg: "Number of flips must be at least 1 and at most 8";
+      msg: "Number of flips must equal 1";
       name: "InvalidNumFlips";
+    },
+    {
+      code: 6007;
+      msg: "Invalid value for bets (may not match on-chain data)";
+      name: "InvalidBets";
     }
   ];
   instructions: [
@@ -237,6 +242,10 @@ export type FlipperProgram = {
         }
       ];
       args: [
+        {
+          name: "bets";
+          type: "u8";
+        },
         {
           name: "results";
           type: "u8";
@@ -597,8 +606,13 @@ export const IDL: FlipperProgram = {
     },
     {
       code: 6006,
-      msg: "Number of flips must be at least 1 and at most 8",
+      msg: "Number of flips must equal 1",
       name: "InvalidNumFlips",
+    },
+    {
+      code: 6007,
+      msg: "Invalid value for bets (may not match on-chain data)",
+      name: "InvalidBets",
     },
   ],
   instructions: [
@@ -736,6 +750,10 @@ export const IDL: FlipperProgram = {
         },
       ],
       args: [
+        {
+          name: "bets",
+          type: "u8",
+        },
         {
           name: "results",
           type: "u8",

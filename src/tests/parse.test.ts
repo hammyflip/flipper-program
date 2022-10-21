@@ -8,6 +8,7 @@ import {
 import { WRAPPED_SOL_MINT } from "constants/AccountConstants";
 import parseCreateBettorInfoTx from "parse/parseCreateBettorInfoIx";
 import parseFlipIx from "parse/parseFlipIx";
+import parsePayoutIx from "parse/parsePayoutIx";
 import parsePlaceBetIx from "parse/parsePlaceBetIx";
 import FlipperSdk from "sdk/FlipperSdk";
 import requestAirdrops from "tests/utils/requestAirdrops";
@@ -17,6 +18,7 @@ import Environment from "types/enums/Environment";
 
 const AMOUNT = LAMPORTS_PER_SOL;
 const AUTHORITY = Keypair.generate();
+const BETS = 1;
 const FEE_BASIS_POINTS = 300;
 const TREASURY_MINT = WRAPPED_SOL_MINT;
 const USER = Keypair.generate();
@@ -89,7 +91,6 @@ describe("Instruction parsing tests", () => {
   });
 
   it("Parse place_bet ix", async () => {
-    const bets = 1;
     const numFlips = 1;
 
     const tx = await sdk.placeBetTx(
@@ -99,7 +100,7 @@ describe("Instruction parsing tests", () => {
       },
       {
         amount: AMOUNT,
-        bets,
+        bets: BETS,
         numFlips,
       }
     );
@@ -117,7 +118,7 @@ describe("Instruction parsing tests", () => {
     );
 
     expect(ixData.amount).toEqual(AMOUNT);
-    expect(ixData.bets).toEqual(bets);
+    expect(ixData.bets).toEqual(BETS);
     expect(ixData.numFlips).toEqual(numFlips);
   });
 
@@ -146,6 +147,27 @@ describe("Instruction parsing tests", () => {
       TREASURY_MINT.toString()
     );
 
+    expect(ixData.bets).toEqual(BETS);
     expect(ixData.results).toEqual(results);
+  });
+
+  it("Parse payout ix", async () => {
+    const tx = await sdk.payoutTx({
+      bettor: USER.publicKey,
+      treasuryMint: TREASURY_MINT,
+    });
+    const txid = await sendTransactionForTest(connection, tx, [AUTHORITY]);
+
+    const ix = await getFirstAndOnlyIx(txid);
+    const parsedIx = parsePayoutIx(ix as PartiallyDecodedInstruction);
+
+    expect(parsedIx).not.toBeNull();
+    invariant(parsedIx != null);
+
+    const { accounts: ixAccounts } = parsedIx;
+    expect(ixAccounts.bettor.toString()).toEqual(USER.publicKey.toString());
+    expect(ixAccounts.treasuryMint.toString()).toEqual(
+      TREASURY_MINT.toString()
+    );
   });
 });
