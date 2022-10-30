@@ -25,5 +25,3 @@ spl-associated-token-account = { version = "1.0.3", features = [
 mpl-token-metadata = { version = "1.2.4", features = ["no-entrypoint"] }
 thiserror = "1.0"
 arrayref = "0.3.6"
-num-traits = "0.2"
-num-derive = "0.2"
