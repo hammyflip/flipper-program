@@ -43,6 +43,9 @@ jobs:
       - name: Install anchor
         run: npm i -g @project-serum/anchor-cli@0.24.2
 
+      - name: Install solana
+        run: sh -c "$(curl -sSfL https://release.solana.com/v1.14.3/install)"
+
       - name: Build programs
         run: anchor build --verifiable
 
