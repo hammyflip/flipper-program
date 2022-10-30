@@ -41,7 +41,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Install anchor
-        run: npm i -g @project-serum/anchor-cli@0.25.0
+        run: npm i -g @project-serum/anchor-cli@0.24.2
 
       - name: Build programs
         run: anchor build --verifiable
