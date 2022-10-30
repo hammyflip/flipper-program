@@ -44,7 +44,7 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          toolchain: nightly
 
       # Needed for cargo install anchor-cli step
       - name: Install libudev-dev

@@ -1,4 +1,4 @@
-import { AnchorProvider, Idl, Program } from "@project-serum/anchor";
+import { AnchorProvider, Program } from "@project-serum/anchor";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { FLIPPER_PROGRAM_ID } from "constants/ProgramIds";
 import { Flipper, FLIPPER_IDL, FlipperProgram } from "generated";
@@ -36,7 +36,7 @@ export default class FlipperSdk {
   }) {
     this._connection = connection;
 
-    this._authority = authority ?? authority;
+    this._authority = authority;
 
     const provider = new AnchorProvider(connection, wallet, {
       preflightCommitment: "recent",
