@@ -62,6 +62,9 @@ jobs:
       - name: Install Solana
         run: sh -c "$(curl -sSfL https://release.solana.com/v1.14.3/install)"
 
+      - name: Add Solana to path
+        run: export PATH="/home/runner/.local/share/solana/install/active_release/bin:$PATH"
+
       - name: Check Solana version
         run: solana --version
 
