@@ -52,13 +52,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libudev-dev
 
-      - name: Install avm
-        run: cargo install --git https://github.com/project-serum/anchor avm --locked --force
-
-      # The anchor-cli version should match the version program Anchor version
-      - name: Install Anchor version
-        run: avm install 0.24.2
-
       - name: Install Solana
         run: sh -c "$(curl -sSfL https://release.solana.com/v1.14.3/install)"
 
@@ -67,6 +60,13 @@ jobs:
 
       - name: Check Solana version
         run: solana --version
+
+      - name: Install avm
+        run: cargo install --git https://github.com/project-serum/anchor avm --locked --force
+
+      # The anchor-cli version should match the version program Anchor version
+      - name: Install Anchor version
+        run: avm install 0.24.2
 
       - name: Build programs
         run: anchor build --verifiable
