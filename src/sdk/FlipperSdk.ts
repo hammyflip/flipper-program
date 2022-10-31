@@ -291,7 +291,7 @@ export default class FlipperSdk {
     return ixToTx(ix);
   }
 
-  async withdrawFromTreasury(
+  async withdrawFromTreasuryTx(
     {
       creator,
       treasuryMint,

@@ -110,7 +110,7 @@ describe("Auction House tests, treasury mint = SOL", () => {
 
     // Then withdraw
     const amount = 1;
-    const tx = await sdk.withdrawFromTreasury(
+    const tx = await sdk.withdrawFromTreasuryTx(
       {
         creator: AUTHORITY.publicKey,
         treasuryMint: TREASURY_MINT,
