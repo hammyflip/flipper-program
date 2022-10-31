@@ -9,7 +9,7 @@ const AUTHORITY_DEV = new PublicKey(
   "authyWritV3BSybcBdkQc1fMaQ7ycidrvYiRKvtjbec"
 );
 const AUTHORITY_MAINNET = new PublicKey(
-  "auth6FQ5A3YM8YR77w8XzrCaTk4sSnUGAcNmPVtHMZT.json"
+  "auth6FQ5A3YM8YR77w8XzrCaTk4sSnUGAcNmPVtHMZT"
 );
 
 export const AUTHORITIES = {
