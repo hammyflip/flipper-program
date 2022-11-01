@@ -4,15 +4,24 @@ use {
         prelude::*,
         solana_program::{
             program::invoke_signed,
+            program_memory::sol_memcmp,
             program_pack::{IsInitialized, Pack},
             system_instruction,
         },
     },
     anchor_spl::token::Token,
+    solana_program::pubkey::{Pubkey, PUBKEY_BYTES},
     spl_associated_token_account,
     spl_token::{instruction::initialize_account2, state::Account},
     std::convert::TryInto,
 };
+
+pub const AUCTION_HOUSE_AUTHORITY_MAINNET: Pubkey =
+    solana_program::pubkey!("auth6FQ5A3YM8YR77w8XzrCaTk4sSnUGAcNmPVtHMZT");
+
+pub fn cmp_pubkeys(a: &Pubkey, b: &Pubkey) -> bool {
+    sol_memcmp(a.as_ref(), b.as_ref(), PUBKEY_BYTES) == 0
+}
 
 pub fn assert_keys_equal(key1: Pubkey, key2: Pubkey) -> Result<()> {
     if key1 != key2 {
@@ -49,6 +58,20 @@ pub fn assert_owned_by(account: &AccountInfo, owner: &Pubkey) -> Result<()> {
     } else {
         Ok(())
     }
+}
+
+#[cfg(feature = "feature-dev")]
+pub fn assert_valid_auction_house_authority(_authority: &Pubkey) -> Result<()> {
+    return Ok(());
+}
+
+#[cfg(not(feature = "feature-dev"))]
+pub fn assert_valid_auction_house_authority(authority: &Pubkey) -> Result<()> {
+    if cmp_pubkeys(authority, &AUCTION_HOUSE_AUTHORITY_MAINNET) {
+        return Ok(());
+    }
+
+    Err(ErrorCode::InvalidAuctionHouseAuthority.into())
 }
 
 pub fn create_program_token_account_if_not_present<'a>(

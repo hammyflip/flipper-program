@@ -33,10 +33,11 @@ pub mod flipper_program {
         treasury_bump: u8,
         fee_basis_points: u16,
     ) -> Result<()> {
-        // TODO: add some validation on authority for mainnet. We should ony allow KNOWN authorities.
-
         let payer = &ctx.accounts.payer;
         let authority = &ctx.accounts.authority;
+
+        assert_valid_auction_house_authority(authority.key)?;
+
         let treasury_mint = &ctx.accounts.treasury_mint;
         let auction_house = &mut ctx.accounts.auction_house;
         let auction_house_treasury = &ctx.accounts.auction_house_treasury;
@@ -134,6 +135,8 @@ pub mod flipper_program {
             return Err(ErrorCode::InvalidBets.into());
         }
 
+        msg!("bets {}", bets);
+        msg!("results {}", results);
         bettor_info.results = results;
 
         Ok(())
@@ -178,6 +181,7 @@ pub mod flipper_program {
         ];
 
         if bettor_info.bets == bettor_info.results {
+            msg!("Bettor won!");
             // Pay bettor
             if is_native {
                 invoke_signed(
@@ -247,6 +251,7 @@ pub mod flipper_program {
                 )?;
             }
         } else {
+            msg!("Bettor lost");
             // Pay treasury
             if is_native {
                 invoke_signed(
@@ -733,4 +738,6 @@ pub enum ErrorCode {
     InvalidNumFlips,
     #[msg("Invalid value for bets (may not match on-chain data)")]
     InvalidBets,
+    #[msg("Invalid auction house authority")]
+    InvalidAuctionHouseAuthority,
 }

@@ -13,7 +13,7 @@
     "@hammyflip:registry": "https://npm.pkg.github.com"
   },
   "scripts": {
-    "build-program": "anchor build --skip-lint",
+    "build-program": "anchor build --skip-lint -- --features \"feature-dev\"",
     "build-sdk": "tsc -P tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "deploy-program": "./scripts/deploy-program.sh",
     "eslint": "eslint --cache 'src/**/*.ts'",

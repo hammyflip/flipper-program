@@ -534,6 +534,7 @@ dependencies = [
  "anchor-spl",
  "arrayref",
  "mpl-token-metadata",
+ "solana-program",
  "spl-associated-token-account",
  "spl-token",
  "thiserror",

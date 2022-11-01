@@ -11,7 +11,7 @@ TESTS=$1
 # Swap in localnet program ID
 # sed -i '' "s/$MAINNET_PROGRAM_ID/$LOCALNET_PROGRAM_ID/" programs/formfn-gumdrop/src/lib.rs
 
-anchor test --skip-lint $TESTS
+anchor test --skip-lint $TESTS -- --features "feature-dev"
 
 # Swap mainnet program ID back
 # sed -i '' "s/$LOCALNET_PROGRAM_ID/$MAINNET_PROGRAM_ID/" programs/formfn-gumdrop/src/lib.rs
