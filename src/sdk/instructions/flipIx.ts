@@ -10,13 +10,14 @@ type Accounts = {
 };
 
 type Args = {
+  bets?: number;
   program: FlipperProgram;
   results: number;
 };
 
 export default async function flipIx(
   { auctionHouse, authority, bettor, treasuryMint }: Accounts,
-  { results, program }: Args
+  { bets, results, program }: Args
 ): Promise<TransactionInstruction> {
   const [bettorInfo] = await findBettorInfoPda(
     bettor,
@@ -24,10 +25,13 @@ export default async function flipIx(
     program.programId
   );
 
-  const bettorInfoAccount = await program.account.bettorInfo.fetch(bettorInfo);
+  const betsToUse =
+    bets != null
+      ? bets
+      : (await program.account.bettorInfo.fetch(bettorInfo)).bets;
 
   return program.methods
-    .flip(bettorInfoAccount.bets, results)
+    .flip(betsToUse, results)
     .accounts({
       auctionHouse,
       authority,

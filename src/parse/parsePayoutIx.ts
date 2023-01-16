@@ -22,7 +22,7 @@ export default function parsePayoutIx(ix: PartiallyDecodedInstruction) {
       treasuryMint: ix.accounts[TREASURY_MINT_ACCOUNT_POSITION],
     },
     data: {
-      results: ixData.results,
+      results: ixData.results as number,
     },
   };
 }

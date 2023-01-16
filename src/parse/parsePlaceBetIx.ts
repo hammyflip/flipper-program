@@ -22,9 +22,9 @@ export default function parsePlaceBetIx(ix: PartiallyDecodedInstruction) {
       treasuryMint: ix.accounts[TREASURY_MINT_ACCOUNT_POSITION],
     },
     data: {
-      amount: ixData.amount.toNumber(),
-      bets: ixData.bets,
-      numFlips: ixData.numFlips,
+      amount: ixData.amount.toNumber() as number,
+      bets: ixData.bets as number,
+      numFlips: ixData.numFlips as number,
     },
   };
 }

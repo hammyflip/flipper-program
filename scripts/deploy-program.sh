@@ -25,7 +25,7 @@ fi
 echo -e "\nBuilding program ID $PROGRAM_ID for Solana $ENVIRONMENT.\n"
 
 # Build program.
-cargo +bpf build --package flipper-program --target bpfel-unknown-unknown --release -- --features "feature-dev"
+cargo +bpf build --package flipper-program --target bpfel-unknown-unknown --release --features "feature-dev"
 echo -e "\nBuild finished!\n"
 
 DEPLOYER_ADDRESS=$(solana-keygen pubkey keys/devnet/deployer-keypair.json)

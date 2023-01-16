@@ -149,8 +149,10 @@ export default class FlipperSdk {
       treasuryMint: PublicKey;
     },
     {
+      bets,
       results,
     }: {
+      bets?: number;
       results: number;
     }
   ) {
@@ -166,6 +168,7 @@ export default class FlipperSdk {
         treasuryMint,
       },
       {
+        bets,
         program: this.program,
         results,
       }

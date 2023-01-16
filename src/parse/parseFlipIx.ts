@@ -22,8 +22,8 @@ export default function parseFlipIx(ix: PartiallyDecodedInstruction) {
       treasuryMint: ix.accounts[TREASURY_MINT_ACCOUNT_POSITION],
     },
     data: {
-      bets: ixData.bets,
-      results: ixData.results,
+      bets: ixData.bets as number,
+      results: ixData.results as number,
     },
   };
 }
