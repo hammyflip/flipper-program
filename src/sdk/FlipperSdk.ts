@@ -339,7 +339,10 @@ export default class FlipperSdk {
       treasuryMint
     );
     return {
-      account: await this.program.account.auctionHouse.fetch(auctionHouse),
+      account: await this.program.account.auctionHouse.fetch(
+        auctionHouse,
+        "confirmed"
+      ),
       pubkey: auctionHouse,
     };
   }
@@ -347,7 +350,10 @@ export default class FlipperSdk {
   async fetchBettorInfo(bettor: PublicKey, treasuryMint: PublicKey) {
     const [bettorInfo] = await this.findBettorInfoPda(bettor, treasuryMint);
     return {
-      account: await this.program.account.bettorInfo.fetch(bettorInfo),
+      account: await this.program.account.bettorInfo.fetch(
+        bettorInfo,
+        "confirmed"
+      ),
       pubkey: bettorInfo,
     };
   }
