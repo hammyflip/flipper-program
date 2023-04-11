@@ -1,0 +1,15 @@
+[features]
+seeds = false
+skip-lint = false
+[programs.localnet]
+flipper_program = "hamRNY1AjpqcjKqHHMi6ump7rSJafQSKKVKCFzC5oQ7"
+
+[registry]
+url = "https://api.apr.dev"
+
+[provider]
+cluster = "localnet"
+wallet = "/Users/mlim/.config/solana/id.json"
+
+[scripts]
+test = "yarn test-program"

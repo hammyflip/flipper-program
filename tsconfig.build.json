@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "src",
+    "declaration": true,
+    "declarationMap": true,
+    "lib": ["es2015", "dom"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noEmit": false,
+    "outDir": "dist/",
+    "removeComments": false,
+    "sourceMap": true
+  },
+  "include": ["src/"],
+  "exclude": ["src/tests", "src/scripts"]
+}
